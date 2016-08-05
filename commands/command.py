@@ -167,7 +167,8 @@ def main():
           creates = dict(),
           removes = dict(),
           warn = dict(type='bool', default=True),
-        )
+        ),
+        supports_check_mode=True,
     )
 
     shell = module.params['_uses_shell']
@@ -220,6 +221,13 @@ def main():
     if not shell:
         args = shlex.split(args)
     startd = datetime.datetime.now()
+
+    if module.check_mode:
+        module.exit_json(
+            cmd      = args,
+            changed  = True,
+            warnings = warnings
+        )
 
     rc, out, err = module.run_command(args, executable=executable, use_unsafe_shell=shell)
 
